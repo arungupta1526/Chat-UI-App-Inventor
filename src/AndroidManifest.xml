@@ -7,5 +7,13 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity> -->
+
+    <!-- You can use any manifest tag that goes inside the <application> tag -->
+    <!-- <service android:name="com.example.MyService"> ... </service> -->
   </application>
+
+  <!-- Other than <application> level tags, you can use <uses-permission> & <queries> tags -->
+  <!-- <uses-permission android:name="android.permission.INTERNET"/> -->
+  <!-- <queries> ... </queries> -->
+
 </manifest>

@@ -1,3 +1,13 @@
+// ChatUI.java Created by white_tiger.
+// This file is part of the Chat-UI-App-Inventor project.
+// It is an extension component for creating a chat UI in App Inventor.
+// Created using Rush, and now migrate from Rush to "Fast-CLI" a tool for building App Inventor extensions.
+
+// Migrated by: [Arun Gupta] 
+// [https://community.appinventor.mit.edu/u/prem_gupta/summary] 
+// [https://www.telegram.me/ArunGupta1526]
+// Date: [15/07/2025]
+
 package com.xtiger.chatui;
 
 import com.google.appinventor.components.annotations.*;
@@ -13,7 +23,6 @@ import android.widget.FrameLayout;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.ViewGroup;
@@ -21,6 +30,8 @@ import android.util.TypedValue;
 import android.os.Handler;
 import android.view.Gravity;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,6 +42,12 @@ import java.io.File;
 import android.os.AsyncTask;
 import java.util.ArrayList;
 import java.util.List;
+
+@DesignerComponent(version = 2, versionName = "2.0", description = "Extension component for ChatUI. Created using Fast-cli."
+        +
+        "<br>Extension Post Link: <a href='https://community.appinventor.mit.edu/t/chatui-simple-chat-interface-extension/122943/'>Chat UI Extension by white_tiger</a>"
+        +
+        "<br>For more details, visit the <a href='https://github.com/himalayanxtiger/Chat-UI-App-Inventor'>developer's Github Repo</a>.", iconName = "icon.png", helpUrl = "https://community.appinventor.mit.edu/u/white_tiger/summary")
 
 public class ChatUI extends AndroidNonvisibleComponent implements Component {
 
@@ -48,27 +65,19 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
     private int messageVerticalPadding = 12;
     private boolean showTimestamp = true;
     private boolean showReadStatus = true;
-    private int backgroundColor = Color.WHITE;
     private String fontFamily = "sans-serif";
     private int fontSize = 14;
     private boolean showTypingIndicator = false;
     private Handler typingHandler = new Handler();
     private Runnable typingRunnable;
-    private List<String> reactions = new ArrayList<>();
     private Typeface typeface;
-    private String backgroundImagePath;
-    private List<Integer> gradientColors;
+    private List<View> selectedMessages;
+    private TextView typingIndicatorView;
 
     public ChatUI(ComponentContainer container) {
         super(container.$form());
         this.container = container;
-        reactions.add("👍");
-        reactions.add("❤️");
-        reactions.add("😆");
-        reactions.add("😮");
-        reactions.add("😢");
-        reactions.add("😡");
-        gradientColors = new ArrayList<>();
+        selectedMessages = new ArrayList<>();
     }
 
     @SimpleFunction(description = "Initialize the chat UI in a VerticalArrangement")
@@ -81,21 +90,31 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
 
         FrameLayout frameLayout = (FrameLayout) arrangement.getView();
         frameLayout.addView(scrollView, new FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        ));
-        
-        updateBackground();
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
     }
 
     @SimpleFunction(description = "Send a message")
-    public void Send(String message, String avatarUrl, String senderName) {
-        addMessageToUI(message, avatarUrl, true, senderName);
+    public void Send(String message, String avatarUrl, String senderName, String timestamp) {
+        addMessageToUI(message, avatarUrl, true, senderName, timestamp);
     }
 
     @SimpleFunction(description = "Receive a message")
-    public void Receive(String message, String avatarUrl, String receiverName) {
-        addMessageToUI(message, avatarUrl, false, receiverName);
+    public void Receive(String message, String avatarUrl, String receiverName, String timestamp) {
+        addMessageToUI(message, avatarUrl, false, receiverName, timestamp);
+    }
+
+    @SimpleFunction(description = "Add a submessage to indicate someone joined the chat")
+    public void AddSubmessage(String message) {
+        TextView submessageView = new TextView(container.$context());
+        submessageView.setText(message);
+        submessageView.setTextColor(Color.GRAY);
+        submessageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize - 2);
+        submessageView.setGravity(Gravity.CENTER);
+        submessageView.setPadding(16, 8, 16, 8);
+
+        chatContainer.addView(submessageView);
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     @SimpleFunction(description = "Show typing indicator")
@@ -110,24 +129,10 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         removeTypingIndicator();
     }
 
-    @SimpleFunction(description = "Add reaction to a message")
-    public void AddReaction(int messageIndex, String reaction) {
-        if (messageIndex >= 0 && messageIndex < chatContainer.getChildCount()) {
-            View messageView = chatContainer.getChildAt(messageIndex);
-            if (messageView instanceof LinearLayout) {
-                LinearLayout reactionContainer = new LinearLayout(container.$context());
-                reactionContainer.setOrientation(LinearLayout.HORIZONTAL);
-                TextView reactionView = new TextView(container.$context());
-                reactionView.setText(reaction);
-                reactionView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-                reactionView.setPadding(8, 4, 8, 4);
-                GradientDrawable shape = new GradientDrawable();
-                shape.setColor(Color.parseColor("#E0E0E0"));
-                shape.setCornerRadius(16);
-                reactionView.setBackground(shape);
-                reactionContainer.addView(reactionView);
-                ((LinearLayout) messageView).addView(reactionContainer);
-            }
+    @SimpleFunction(description = "Delete a message by index (starting from 1)")
+    public void DeleteMessage(int index) {
+        if (index > 0 && index <= chatContainer.getChildCount()) {
+            chatContainer.removeViewAt(index - 1);
         }
     }
 
@@ -186,18 +191,6 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         showReadStatus = show;
     }
 
-    @SimpleProperty(description = "Set the background color of the chat")
-    public void BackgroundColor(int color) {
-        backgroundColor = color;
-        updateBackground();
-    }
-
-    @SimpleProperty(description = "Set the background image of the chat")
-    public void BackgroundImage(String imagePath) {
-        backgroundImagePath = imagePath;
-        updateBackground();
-    }
-
     @SimpleProperty(description = "Set the font family for messages")
     public void FontFamily(String typefacePath) {
         loadTypeface(typefacePath);
@@ -208,6 +201,16 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         fontSize = size;
     }
 
+    @SimpleEvent(description = "Event raised when a profile picture is clicked")
+    public void ProfilePictureClicked(String name) {
+        EventDispatcher.dispatchEvent(this, "ProfilePictureClicked", name);
+    }
+
+    @SimpleEvent(description = "Event raised when a message is selected")
+    public void MessageSelected(String message, int index) {
+        EventDispatcher.dispatchEvent(this, "MessageSelected", message, index);
+    }
+
     private void loadTypeface(String typefacePath) {
         try {
             if (isCompanion()) {
@@ -215,10 +218,10 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
                 final String platform = packageName.contains("makeroid")
                         ? "Makeroid"
                         : packageName.contains("Niotron")
-                        ? "Niotron"
-                        : packageName.contains("Appzard")
-                        ? "Appzard"
-                        : "AppInventor";
+                                ? "Niotron"
+                                : packageName.contains("Appzard")
+                                        ? "Appzard"
+                                        : "AppInventor";
                 typefacePath = android.os.Build.VERSION.SDK_INT > 28
                         ? "/storage/emulated/0/Android/data/" + packageName + "/files/assets/" + typefacePath
                         : "/storage/emulated/0/" + platform + "/assets/" + typefacePath;
@@ -232,36 +235,7 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         }
     }
 
-    private void updateBackground() {
-        if (scrollView != null) {
-            if (backgroundImagePath != null && !backgroundImagePath.isEmpty()) {
-                try {
-                    Bitmap bitmap;
-                    if (isCompanion()) {
-                        bitmap = BitmapFactory.decodeFile(backgroundImagePath);
-                    } else {
-                        InputStream inputStream = form.$context().getAssets().open(backgroundImagePath);
-                        bitmap = BitmapFactory.decodeStream(inputStream);
-                    }
-                    BitmapDrawable bitmapDrawable = new BitmapDrawable(container.$context().getResources(), bitmap);
-                    scrollView.setBackground(bitmapDrawable);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    scrollView.setBackgroundColor(backgroundColor);
-                }
-            } else if (!gradientColors.isEmpty()) {
-                GradientDrawable gradient = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    gradientColors.stream().mapToInt(Integer::intValue).toArray()
-                );
-                scrollView.setBackground(gradient);
-            } else {
-                scrollView.setBackgroundColor(backgroundColor);
-            }
-        }
-    }
-
-    private void addMessageToUI(String message, String avatarUrl, boolean isSent, String name) {
+    private void addMessageToUI(String message, String avatarUrl, boolean isSent, String name, String timestamp) {
         LinearLayout messageLayout = new LinearLayout(container.$context());
         messageLayout.setOrientation(LinearLayout.VERTICAL);
         messageLayout.setPadding(0, 8, 0, 8);
@@ -272,10 +246,10 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         LinearLayout contentLayout = new LinearLayout(container.$context());
         contentLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-        ImageView avatarView = createAvatarView();
+        ImageView avatarView = createAvatarView(name);
         loadAvatarImage(avatarView, avatarUrl);
         TextView messageView = createMessageView(message, isSent);
-        TextView timeView = createTimeView();
+        TextView timeView = createTimeView(timestamp);
         TextView statusView = createStatusView(isSent);
 
         LinearLayout textLayout = new LinearLayout(container.$context());
@@ -283,15 +257,18 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
 
         if (isSent) {
             textLayout.addView(messageView);
-            if (showTimestamp) textLayout.addView(timeView);
-            if (showReadStatus) textLayout.addView(statusView);
+            if (showTimestamp)
+                textLayout.addView(timeView);
+            if (showReadStatus)
+                textLayout.addView(statusView);
             contentLayout.addView(textLayout);
             contentLayout.addView(avatarView);
             contentLayout.setGravity(Gravity.RIGHT);
         } else {
             contentLayout.addView(avatarView);
             textLayout.addView(messageView);
-            if (showTimestamp) textLayout.addView(timeView);
+            if (showTimestamp)
+                textLayout.addView(timeView);
             contentLayout.addView(textLayout);
             contentLayout.setGravity(Gravity.LEFT);
         }
@@ -299,6 +276,8 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         messageLayout.addView(contentLayout);
         chatContainer.addView(messageLayout);
         scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+
+        setupLongClickListener(messageLayout, message);
     }
 
     private TextView createNameView(String name, boolean isSent) {
@@ -312,12 +291,14 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         return nameView;
     }
 
-    private ImageView createAvatarView() {
+    private ImageView createAvatarView(final String name) {
         ImageView avatarView = new ImageView(container.$context());
-        int avatarSizePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, avatarSize, container.$context().getResources().getDisplayMetrics());
+        int avatarSizePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, avatarSize,
+                container.$context().getResources().getDisplayMetrics());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(avatarSizePx, avatarSizePx);
         params.setMargins(8, 0, 8, 0);
         avatarView.setLayoutParams(params);
+        avatarView.setOnClickListener(v -> ProfilePictureClicked(name));
         return avatarView;
     }
 
@@ -360,7 +341,8 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         TextView messageView = new TextView(container.$context());
         messageView.setText(message);
         messageView.setTextColor(isSent ? sentTextColor : receivedTextColor);
-        messageView.setPadding(messageHorizontalPadding, messageVerticalPadding, messageHorizontalPadding, messageVerticalPadding);
+        messageView.setPadding(messageHorizontalPadding, messageVerticalPadding, messageHorizontalPadding,
+                messageVerticalPadding);
         messageView.setTypeface(typeface != null ? typeface : Typeface.DEFAULT);
         messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, fontSize);
 
@@ -370,34 +352,35 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         messageView.setBackground(shape);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(4, 2, 4, 2);
         messageView.setLayoutParams(params);
 
-        int maxWidthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, messageMaxWidth, container.$context().getResources().getDisplayMetrics());
+        int maxWidthPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, messageMaxWidth,
+                container.$context().getResources().getDisplayMetrics());
         messageView.setMaxWidth(maxWidthPx);
-
         return messageView;
     }
 
-    private TextView createTimeView() {
+    private TextView createTimeView(String timestamp) {
         TextView timeView = new TextView(container.$context());
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String currentTime = sdf.format(new Date());
-        timeView.setText(currentTime);
+        timeView.setText(timestamp != null && !timestamp.isEmpty() ? timestamp : getCurrentTime());
         timeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         timeView.setTextColor(Color.GRAY);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(8, 2, 8, 2);
         timeView.setLayoutParams(params);
 
         return timeView;
+    }
+
+    private String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
     private TextView createStatusView(boolean isSent) {
@@ -409,9 +392,8 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         statusView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        );
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         params.setMargins(8, 2, 8, 2);
         statusView.setLayoutParams(params);
 
@@ -419,6 +401,13 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
     }
 
     private void addTypingIndicator() {
+        if (typingIndicatorView == null) {
+            typingIndicatorView = new TextView(container.$context());
+            typingIndicatorView.setTextColor(Color.GRAY);
+            typingIndicatorView.setPadding(16, 8, 16, 8);
+            chatContainer.addView(typingIndicatorView);
+        }
+
         if (typingRunnable != null) {
             typingHandler.removeCallbacks(typingRunnable);
         }
@@ -433,16 +422,13 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
                     for (int i = 0; i < dotCount; i++) {
                         dots.append(".");
                     }
-                    TextView typingView = new TextView(container.$context());
-                    typingView.setText("Typing" + dots.toString());
-                    typingView.setTextColor(Color.GRAY);
-                    typingView.setPadding(16, 8, 16, 8);
-
-                    chatContainer.addView(typingView);
+                    typingIndicatorView.setText("Typing" + dots.toString());
                     scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
 
                     dotCount = (dotCount + 1) % 4;
                     typingHandler.postDelayed(this, 500);
+                } else {
+                    removeTypingIndicator();
                 }
             }
         };
@@ -454,22 +440,90 @@ public class ChatUI extends AndroidNonvisibleComponent implements Component {
         if (typingRunnable != null) {
             typingHandler.removeCallbacks(typingRunnable);
         }
-        int lastIndex = chatContainer.getChildCount() - 1;
-        if (lastIndex >= 0) {
-            View lastView = chatContainer.getChildAt(lastIndex);
-            if (lastView instanceof TextView) {
-                TextView lastTextView = (TextView) lastView;
-                if (lastTextView.getText().toString().startsWith("Typing")) {
-                    chatContainer.removeViewAt(lastIndex);
+        if (typingIndicatorView != null) {
+            chatContainer.removeView(typingIndicatorView);
+            typingIndicatorView = null;
+        }
+    }
+
+    @SimpleFunction(description = "Enable or disable link detection in messages")
+    public void EnableLinkDetection(boolean enable) {
+        for (int i = 0; i < chatContainer.getChildCount(); i++) {
+            View view = chatContainer.getChildAt(i);
+            if (view instanceof LinearLayout) {
+                LinearLayout messageLayout = (LinearLayout) view;
+                for (int j = 0; j < messageLayout.getChildCount(); j++) {
+                    View childView = messageLayout.getChildAt(j);
+                    if (childView instanceof TextView) {
+                        TextView messageView = (TextView) childView;
+                        if (enable) {
+                            Linkify.addLinks(messageView, Linkify.WEB_URLS);
+                            messageView.setMovementMethod(LinkMovementMethod.getInstance());
+                        } else {
+                            messageView.setAutoLinkMask(0);
+                            messageView.setMovementMethod(null);
+                        }
+                    }
                 }
             }
         }
     }
 
+    private void setupLongClickListener(View messageLayout, final String message) {
+        messageLayout.setOnLongClickListener(v -> {
+            toggleMessageSelection(messageLayout, message);
+            return true;
+        });
+    }
+
+    private void toggleMessageSelection(View messageLayout, String message) {
+        int index = chatContainer.indexOfChild(messageLayout) + 1; // Adding 1 to start index from 1
+        if (selectedMessages.contains(messageLayout)) {
+            selectedMessages.remove(messageLayout);
+            messageLayout.setBackgroundColor(Color.TRANSPARENT);
+        } else {
+            selectedMessages.add(messageLayout);
+            messageLayout.setBackgroundColor(Color.LTGRAY);
+        }
+        MessageSelected(message, index);
+    }
+
+    @SimpleFunction(description = "Clear all selected messages")
+    public void ClearSelection() {
+        for (View view : selectedMessages) {
+            view.setBackgroundColor(Color.TRANSPARENT);
+        }
+        selectedMessages.clear();
+    }
+
+    @SimpleFunction(description = "Get the number of selected messages")
+    public int GetSelectedCount() {
+        return selectedMessages.size();
+    }
+
+    @SimpleFunction(description = "Delete all selected messages")
+    public void DeleteSelectedMessages() {
+        for (View view : selectedMessages) {
+            chatContainer.removeView(view);
+        }
+        selectedMessages.clear();
+    }
+
+    @SimpleFunction(description = "Get the total number of messages")
+    public int GetMessageCount() {
+        return chatContainer.getChildCount();
+    }
+
+    @SimpleFunction(description = "Clear all messages")
+    public void ClearAllMessages() {
+        chatContainer.removeAllViews();
+        selectedMessages.clear();
+    }
+
     private boolean isCompanion() {
         return container.$context().getPackageName().contains("makeroid") ||
-               container.$context().getPackageName().contains("Niotron") ||
-               container.$context().getPackageName().contains("Appzard") ||
-               container.$context().getPackageName().contains("appinventor");
+                container.$context().getPackageName().contains("Niotron") ||
+                container.$context().getPackageName().contains("Appzard") ||
+                container.$context().getPackageName().contains("aicompanion3");
     }
 }
