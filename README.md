@@ -1,8 +1,3 @@
-<!-- # ChatUI -->
-<!-- An extension for MIT App Inventor 2.
-Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary) -->
-<!-- Compiled by: FAST -->
-
 <div align="center">
 <h1><kbd>🧩 ChatUI</kbd></h1>
 An extension for MIT App Inventor 2.<br>
@@ -13,15 +8,15 @@ Extension component for ChatUI. Created using Rush.
 
 ---
 
-🔎 **Use Place:** An extension for MIT App Inventor 2, Kodular, Nioton, Android Builder.
-👤 **Author:** Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary)
-📦 **Package:** com.xtiger.chatui
-💾 **Size:** 19.26 KB
-⚙️ **Version:** 2
-📱 **Minimum API Level:** 7
-📅 **Updated On:** [date=2025-07-15 timezone="Asia/Calcutta"]
-💻 **Built & documented using:** [FAST](https://community.appinventor.mit.edu/t/fast-an-efficient-way-to-build-publish-extensions/129103?u=jewel) <small><mark>v3.8.1</mark></small>
-⬇️ **Aix:** [Download Link](./out/com.xtiger.chatui.aix)
+🔎 **Use Place:** An extension for MIT App Inventor 2, Kodular, Nioton, Android Builder. <br>
+👤 **Author:** Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary) <br>
+📦 **Package:** com.xtiger.chatui <br>
+💾 **Size:** 19.26 KB <br>
+⚙️ **Version:** 2 <br>
+📱 **Minimum API Level:** 7 <br>
+📅 **Updated On:** [date=2025-07-15 timezone="Asia/Calcutta"] <br>
+💻 **Built & documented using:** [FAST](https://community.appinventor.mit.edu/t/fast-an-efficient-way-to-build-publish-extensions/129103?u=jewel) <small><mark>v3.8.1</mark></small> <br>
+⬇️ **Aix:** [Download Link](./out/com.xtiger.chatui.aix) <br>
 
 ## <kbd>Events:</kbd>
 
