@@ -1,8 +1,3 @@
-<!-- # ChatUI -->
-<!-- An extension for MIT App Inventor 2.
-Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary) -->
-<!-- Compiled by: FAST -->
-
 <div align="center">
 <h1><kbd>🧩 ChatUI</kbd></h1>
 An extension for MIT App Inventor 2.<br>
@@ -13,15 +8,19 @@ Extension component for ChatUI. Created using Rush.
 
 ---
 
-🔎 **Use Place:** An extension for MIT App Inventor 2, Kodular, Nioton, Android Builder.
-👤 **Author:** Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary)
-📦 **Package:** com.xtiger.chatui
-💾 **Size:** 19.26 KB
-⚙️ **Version:** 2
-📱 **Minimum API Level:** 7
-📅 **Updated On:** [date=2025-07-15 timezone="Asia/Calcutta"]
-💻 **Built & documented using:** [FAST](https://community.appinventor.mit.edu/t/fast-an-efficient-way-to-build-publish-extensions/129103?u=jewel) <small><mark>v3.8.1</mark></small>
-⬇️ **Aix:** [Download Link](./out/com.xtiger.chatui.aix)
+🔎 **Use Place:** An extension for MIT App Inventor 2, Kodular, Niotron, Android Builder. <br>
+👤 **Author:** Created by: [white_tiger](https://community.appinventor.mit.edu/u/white_tiger/summary) <br>
+📦 **Package:** com.xtiger.chatui <br>
+💾 **Size:** 19.26 KB <br>
+⚙️ **Version:** 2 <br>
+📱 **Minimum API Level:** 7 <br>
+📅 **Updated On:** [date=2025-07-15 timezone="Asia/Calcutta"] <br>
+💻 **Built & documented using:** [FAST](https://community.appinventor.mit.edu/t/fast-an-efficient-way-to-build-publish-extensions/129103?u=jewel) <small><mark>v3.8.1</mark></small> <br>
+⬇️ **Aix:** [Download Link](./out/com.xtiger.chatui.aix) <br>
+
+## <kbd>Total Blocks of Extension:</kbd>
+
+![Total Blocks of Extension](./out/blocks/appinventor/ChatUI/blocks.png){width=90%}
 
 ## <kbd>Events:</kbd>
 
@@ -29,6 +28,7 @@ Extension component for ChatUI. Created using Rush.
 
 ### 1. ProfilePictureClicked
 
+![ProfilePictureClicked](./out/blocks/appinventor/ChatUI/ProfilePictureClicked_Event.png)
 Event raised when a profile picture is clicked
 
 | Parameter | Type |
@@ -37,6 +37,7 @@ Event raised when a profile picture is clicked
 
 ### 2. MessageSelected
 
+![MessageSelected](./out/blocks/appinventor/ChatUI/MessageSelected_Event.png)
 Event raised when a message is selected
 
 | Parameter | Type   |
@@ -50,6 +51,7 @@ Event raised when a message is selected
 
 ### 1. Initialize
 
+![Initialize](./out/blocks/appinventor/ChatUI/Initialize_Call_Method.png)
 Initialize the chat UI in a VerticalArrangement
 
 | Parameter   | Type      |
@@ -58,6 +60,7 @@ Initialize the chat UI in a VerticalArrangement
 
 ### 2. Send
 
+![Send](./out/blocks/appinventor/ChatUI/Send_Call_Method.png)
 Send a message
 
 | Parameter  | Type |
@@ -69,6 +72,7 @@ Send a message
 
 ### 3. Receive
 
+![Receive](./out/blocks/appinventor/ChatUI/Receive_Call_Method.png)
 Receive a message
 
 | Parameter    | Type |
@@ -80,6 +84,7 @@ Receive a message
 
 ### 4. AddSubmessage
 
+![AddSubmessage](./out/blocks/appinventor/ChatUI/AddSubmessage_Call_Method.png)
 Add a submessage to indicate someone joined the chat
 
 | Parameter | Type |
@@ -88,14 +93,17 @@ Add a submessage to indicate someone joined the chat
 
 ### 5. ShowTypingIndicator
 
+![ShowTypingIndicator](./out/blocks/appinventor/ChatUI/ShowTypingIndicator_Call_Method.png)
 Show typing indicator
 
 ### 6. HideTypingIndicator
 
+![HideTypingIndicator](./out/blocks/appinventor/ChatUI/HideTypingIndicator_Call_Method.png)
 Hide typing indicator
 
 ### 7. DeleteMessage
 
+![ShowTypingIndicator](./out/blocks/appinventor/ChatUI/DeleteMessage_Call_Method.png)
 Delete a message by index (starting from 1)
 
 | Parameter | Type   |
@@ -104,6 +112,7 @@ Delete a message by index (starting from 1)
 
 ### 8. EnableLinkDetection
 
+![EnableLinkDetection](./out/blocks/appinventor/ChatUI/EnableLinkDetection_Call_Method.png)
 Enable or disable link detection in messages
 
 | Parameter | Type    |
@@ -112,26 +121,31 @@ Enable or disable link detection in messages
 
 ### 9. ClearSelection
 
+![ClearSelection](./out/blocks/appinventor/ChatUI/ClearSelection_Call_Method.png)
 Clear all selected messages
 
 ### 10. GetSelectedCount
 
+![GetSelectedCount](./out/blocks/appinventor/ChatUI/GetSelectedCount_Get_Method.png)
 Get the number of selected messages
 
 - Return type: `number`
 
 ### 11. DeleteSelectedMessages
 
+![DeleteSelectedMessages](./out/blocks/appinventor/ChatUI/DeleteSelectedMessages_Call_Method.png)
 Delete all selected messages
 
 ### 12. GetMessageCount
 
+![GetMessageCount](./out/blocks/appinventor/ChatUI/GetMessageCount_Get_Method.png)
 Get the total number of messages
 
 - Return type: `number`
 
 ### 13. ClearAllMessages
 
+![ClearAllMessages](./out/blocks/appinventor/ChatUI/ClearAllMessages_Call_Method.png)
 Clear all messages
 
 ## <kbd>Setters:</kbd>
@@ -140,78 +154,91 @@ Clear all messages
 
 ### 1. SentMessageColor
 
+![SentMessageColor](./out/blocks/appinventor/ChatUI/SentMessageColor_Set_Property.png)
 Set the color for sent messages
 
 - Input type: `number`
 
 ### 2. ReceivedMessageColor
 
+![ReceivedMessageColor](./out/blocks/appinventor/ChatUI/ReceivedMessageColor_Set_Property.png)
 Set the color for received messages
 
 - Input type: `number`
 
 ### 3. SentTextColor
 
+![SentTextColor](./out/blocks/appinventor/ChatUI/SentTextColor_set_Property.png)
 Set the text color for sent messages
 
 - Input type: `number`
 
 ### 4. ReceivedTextColor
 
+![ReceivedTextColor](./out/blocks/appinventor/ChatUI/ReceivedTextColor_Set_Property.png)
 Set the text color for received messages
 
 - Input type: `number`
 
 ### 5. MessageCornerRadius
 
+![MessageCornerRadius](./out/blocks/appinventor/ChatUI/MessageCornerRadius_Set_Property.png)
 Set the corner radius for message bubbles
 
 - Input type: `number`
 
 ### 6. AvatarSize
 
+![AvatarSize](./out/blocks/appinventor/ChatUI/AvatarSize_Set_Property.png)
 Set the size of avatar images
 
 - Input type: `number`
 
 ### 7. MessageMaxWidth
 
+![MessageMaxWidth](./out/blocks/appinventor/ChatUI/MessageMaxWidth_Set_Property.png)
 Set the maximum width of message bubbles
 
 - Input type: `number`
 
 ### 8. MessageHorizontalPadding
 
+![MessageHorizontalPadding](./out/blocks/appinventor/ChatUI/MessageHorizontalPadding_Set_Property.png)
 Set the horizontal padding of message bubbles
 
 - Input type: `number`
 
 ### 9. MessageVerticalPadding
 
+![MessageVerticalPadding](./out/blocks/appinventor/ChatUI/MessageVerticalPadding_Set_Property.png)
 Set the vertical padding of message bubbles
 
 - Input type: `number`
 
 ### 10. ShowTimestamp
 
+![ShowTimestamp](./out/blocks/appinventor/ChatUI/ShowTimestamp_Set_Property.png)
 Show or hide message timestamps
 
 - Input type: `boolean`
 
 ### 11. ShowReadStatus
 
+![ShowReadStatus](./out/blocks/appinventor/ChatUI/ShowReadStatus_Set_Property.png)
 Show or hide read status for sent messages
 
 - Input type: `boolean`
 
 ### 12. FontFamily
 
+![FontFamily](./out/blocks/appinventor/ChatUI/FontFamily_Set_Property.png)
 Set the font family for messages
 
 - Input type: `text`
 
 ### 13. FontSize
 
+![FontSize](./out/blocks/appinventor/ChatUI/FontSize_Set_Property.png)
 Set the font size for messages
 
 - Input type: `number`
